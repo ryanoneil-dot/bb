@@ -1,9 +1,10 @@
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -64,8 +65,8 @@ model WebhookEvent {
   source       String   // e.g., SQUARE
   eventId      String?  @unique
   signature    String?
-  // Use String for local SQLite dev; production (Postgres) supports Json.
   payload      String
+  payloadJson  Json?
   payloadHash  String   @unique
   processed    Boolean  @default(false)
   createdAt    DateTime @default(now())
