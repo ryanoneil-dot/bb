@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "render-build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start -p $PORT",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
