@@ -44,10 +44,11 @@ export async function handleWebhookPayload(payload: any) {
     if (existing && existing.processed) return
 
     // create or upsert event
+    const payloadToSave = typeof payload === 'string' ? payload : JSON.stringify(payload)
     await prisma.webhookEvent.upsert({
       where: { payloadHash },
-      create: { source: 'SQUARE', eventId: payload?.event_id || null, signature: null, payload: payload as any, payloadHash, processed: false },
-      update: { payload: payload as any },
+      create: { source: 'SQUARE', eventId: payload?.event_id || null, signature: null, payload: payloadToSave as any, payloadHash, processed: false },
+      update: { payload: payloadToSave as any },
     })
 
     // Attempt to extract referenceId from common locations
@@ -56,6 +57,12 @@ export async function handleWebhookPayload(payload: any) {
     if (referenceId) {
       const pending = await prisma.pendingListing.findUnique({ where: { id: referenceId } })
       if (pending && pending.status !== 'completed') {
+        // Ensure seller exists (create placeholder user during local dev if missing)
+        const seller = await prisma.user.findUnique({ where: { id: pending.sellerId } })
+        if (!seller) {
+          await prisma.user.create({ data: { id: pending.sellerId, email: `${pending.sellerId}@dev.local`, name: 'Dev User' } })
+        }
+
         // Create listing
         const images: string[] = JSON.parse(pending.imagesJson || '[]')
         await prisma.listing.create({

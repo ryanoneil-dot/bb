@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/router'
+import SquareBuyButton from '../components/SquareBuyButton'
+import CheckoutPreview from '../components/CheckoutPreview'
 
 const DEFAULT_LAT = 53.6458
 const DEFAULT_LNG = -3.0050
@@ -17,6 +19,9 @@ export default function CreateListing() {
   const [files, setFiles] = useState<FileList | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
+  const [pendingId, setPendingId] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   if (status === 'loading') return <div>Loading...</div>
   if (!session) {
@@ -79,6 +84,17 @@ export default function CreateListing() {
 
       // Open Square checkout in a centered popup (better UX than full redirect)
       if (j.checkoutUrl) {
+        setCheckoutUrl(j.checkoutUrl)
+        setPendingId(j.pendingId)
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(j.checkoutUrl)
+            setCopied(true)
+            setTimeout(() => setCopied(false), 3000)
+          }
+        } catch (e) {
+          // ignore clipboard failures
+        }
         const url = j.checkoutUrl
         const title = 'Square Payment Links'
 
@@ -135,6 +151,13 @@ export default function CreateListing() {
           {loading ? 'Creating…' : 'Create listing'}
         </button>
       </form>
+
+      <div style={{ marginTop: 18 }}>
+        <p style={{ color: '#666' }}>Quick test buy button (opens Square link):</p>
+        <SquareBuyButton />
+      </div>
+
+      {checkoutUrl && <CheckoutPreview checkoutUrl={checkoutUrl} pendingId={pendingId || undefined} />}
     </main>
   )
 }
