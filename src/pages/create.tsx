@@ -14,6 +14,7 @@ export default function CreateListing() {
   const [lat, setLat] = useState(String(DEFAULT_LAT))
   const [lng, setLng] = useState(String(DEFAULT_LNG))
   const [imagesText, setImagesText] = useState('')
+  const [files, setFiles] = useState<FileList | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -28,10 +29,34 @@ export default function CreateListing() {
     setError(null)
     setLoading(true)
     try {
-      const images = imagesText
+      // prepare image URLs: upload selected files (if any) via presigned URLs, then include pasted URLs
+      const fromText = imagesText
         .split('\n')
         .map((s) => s.trim())
         .filter(Boolean)
+
+      const uploaded: string[] = []
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i]
+          // request a presigned URL
+          const presignRes = await fetch('/api/uploads/presign', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, contentType: file.type }),
+          })
+          if (!presignRes.ok) throw new Error('Failed to get upload url')
+          const presign = await presignRes.json()
+          // upload directly to the presigned URL
+          const putRes = await fetch(presign.url, { method: presign.method || 'PUT', headers: presign.headers || {}, body: file })
+          if (!putRes.ok && putRes.status !== 200 && putRes.status !== 201) throw new Error('Upload failed')
+          // constructed public URL: if returned key present and bucket env exists, construct full URL, otherwise use presign.url
+          const publicUrl = presign.key && process.env.NEXT_PUBLIC_S3_BASE_URL ? `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${presign.key}` : presign.url
+          uploaded.push(publicUrl)
+        }
+      }
+
+      const images = [...uploaded, ...fromText]
 
       const body = {
         sellerId: session.user?.id,
@@ -99,7 +124,9 @@ export default function CreateListing() {
         <label style={{ display: 'block', marginTop: 8 }}>Longitude</label>
         <input value={lng} onChange={(e) => setLng(e.target.value)} style={{ width: '160px', padding: 8 }} />
 
-        <label style={{ display: 'block', marginTop: 8 }}>Image URLs (one per line)</label>
+        <label style={{ display: 'block', marginTop: 8 }}>Images</label>
+        <input type="file" accept="image/*" multiple onChange={(e) => setFiles(e.target.files)} />
+        <small style={{ display: 'block', marginTop: 6, color: '#666' }}>Or paste image URLs (one per line)</small>
         <textarea value={imagesText} onChange={(e) => setImagesText(e.target.value)} rows={4} style={{ width: '100%', padding: 8 }} placeholder="https://...\nhttps://..." />
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -111,3 +138,4 @@ export default function CreateListing() {
     </main>
   )
 }
+

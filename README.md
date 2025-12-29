@@ -27,6 +27,30 @@ npm run prisma:migrate
 npm run dev
 ```
 
+S3 / Square (optional production setup):
+
+- Install AWS + Square SDKs if you plan to use real services:
+
+```bash
+npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner @square/square
+```
+
+- Set environment variables (example `.env` values):
+
+```
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+AWS_REGION=eu-west-2
+S3_BUCKET=your-bucket-name
+NEXT_PUBLIC_S3_BASE_URL=https://your-bucket-name.s3.eu-west-2.amazonaws.com
+
+SQUARE_ACCESS_TOKEN=...
+SQUARE_LOCATION_ID=...
+SQUARE_WEBHOOK_SIGNATURE_KEY=...
+```
+
+The app will lazily import the SDKs at runtime if these env vars are present; otherwise it falls back to local stubs for development and testing.
+
 Files of interest:
 - `prisma/schema.prisma` — DB schema (Postgres)
 - `src/pages/api` — server endpoints (listings, auth, uploads)
