@@ -5,6 +5,9 @@ import crypto from 'crypto'
 export const config = { api: { bodyParser: false } }
 
 async function getRawBody(req: NextApiRequest) {
+  // If a testing harness attached `rawBody`, use it (node-mocks-http, etc.).
+  if ((req as any).rawBody) return (req as any).rawBody
+
   const chunks: Buffer[] = []
   for await (const chunk of req as any) {
     chunks.push(Buffer.from(chunk))
