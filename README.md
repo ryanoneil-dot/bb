@@ -51,6 +51,15 @@ SQUARE_WEBHOOK_SIGNATURE_KEY=...
 
 The app will lazily import the SDKs at runtime if these env vars are present; otherwise it falls back to local stubs for development and testing.
 
+Admin and moderation:
+
+- Set `ADMIN_EMAILS` in your `.env` to a comma-separated list of admin emails, e.g. `ADMIN_EMAILS=you@example.com`
+- Admins can view reports at `/admin/reports`.
+
+Promo assets:
+
+- A plain text promo is available at `/promo.txt` and a sample is included in `public/promo.txt`.
+
 Files of interest:
 - `prisma/schema.prisma` — DB schema (Postgres)
 - `src/pages/api` — server endpoints (listings, auth, uploads)
