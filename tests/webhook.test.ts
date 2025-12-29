@@ -30,6 +30,10 @@ const mockPrisma = {
     upsert: jest.fn().mockResolvedValue({}),
     updateMany: jest.fn().mockResolvedValue({}),
   },
+  user: {
+    findUnique: jest.fn().mockResolvedValue(null),
+    create: jest.fn().mockResolvedValue({ id: mockPending.sellerId, email: `${mockPending.sellerId}@dev.local`, name: 'Dev User' }),
+  },
 }
 
 jest.mock('../src/lib/prisma', () => ({ prisma: mockPrisma }))
