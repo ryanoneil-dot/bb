@@ -8,7 +8,7 @@
     "render-build": "prisma generate && prisma migrate deploy && next build",
     "postinstall": "prisma generate",
     "prestart": "prisma generate",
-    "start": "next start -p $PORT",
+    "start": "node scripts/render-start.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
     "test": "jest --runInBand"
