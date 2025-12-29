@@ -5,20 +5,24 @@ export async function createCheckoutLink(amountPence: number, redirectUrl: strin
     try {
       const { Client, Environment } = await import('@square/square')
       const client = new Client({ accessToken: process.env.SQUARE_ACCESS_TOKEN, environment: Environment.Sandbox })
-      const body: any = {
-        idempotency_key: referenceId || `${Date.now()}`,
+      // Create an order first, then create a checkout tied to that order. Use pending.id as idempotency key.
+      const orderBody = {
+        idempotencyKey: referenceId || `${Date.now()}`,
         order: {
-          order: { location_id: process.env.SQUARE_LOCATION_ID },
+          locationId: process.env.SQUARE_LOCATION_ID,
+          lineItems: [
+            { name: 'Listing fee', quantity: '1', basePriceMoney: { amount: amountPence, currency: 'GBP' } },
+          ],
         },
       }
-      // This is a lightweight attempt; integrate properly with Orders/Checkout API per Square docs.
-      const resp = await client.checkoutApi.createCheckout(process.env.SQUARE_LOCATION_ID as string, {
+      const orderResp = await client.ordersApi.createOrder({ order: orderBody.order, idempotencyKey: orderBody.idempotencyKey } as any).catch((e: any) => { throw e })
+      const orderId = orderResp?.result?.order?.id
+      const checkoutResp = await client.checkoutApi.createCheckout(process.env.SQUARE_LOCATION_ID as string, {
         idempotencyKey: referenceId || `${Date.now()}`,
-        order: { locationId: process.env.SQUARE_LOCATION_ID },
+        order: { id: orderId },
         redirectUrl,
-        prePopulatedData: { referenceId },
       } as any)
-      return resp.result || { checkout: { checkoutPageUrl: resp?.result?.checkout?.checkoutPageUrl || '' } }
+      return checkoutResp.result || { checkout: { checkoutPageUrl: checkoutResp?.result?.checkout?.checkoutPageUrl || '' } }
     } catch (e) {
       // If SDK isn't installed or call fails, fall back to stub below.
       console.warn('Square SDK unavailable or failed, falling back to mock checkout', e)

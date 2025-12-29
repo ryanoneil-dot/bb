@@ -57,6 +57,27 @@ model PendingListing {
   createdAt   DateTime @default(now())
 }
 
+model WebhookEvent {
+  id           String   @id @default(cuid())
+  source       String   // e.g., SQUARE
+  eventId      String?  @unique
+  signature    String?
+  payload      Json
+  payloadHash  String   @unique
+  processed    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model ImageVariant {
+  id        String   @id @default(cuid())
+  listingId String?
+  key       String   @unique
+  width     Int
+  height    Int
+  url       String
+  createdAt DateTime @default(now())
+}
+
 /// NextAuth models (Prisma adapter)
 model Account {
   id                 String  @id @default(cuid())

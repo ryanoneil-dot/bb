@@ -23,6 +23,13 @@ const mockPrisma = {
   listing: {
     create: jest.fn().mockResolvedValue(createdListing),
   },
+  webhookEvent: {
+    findUnique: jest.fn().mockResolvedValue(null),
+    create: jest.fn().mockResolvedValue({}),
+    update: jest.fn().mockResolvedValue({}),
+    upsert: jest.fn().mockResolvedValue({}),
+    updateMany: jest.fn().mockResolvedValue({}),
+  },
 }
 
 jest.mock('../src/lib/prisma', () => ({ prisma: mockPrisma }))

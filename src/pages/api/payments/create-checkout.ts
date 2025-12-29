@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const redirectUrl = `${redirectBase}/api/payments/complete?pendingId=${pending.id}`
 
   try {
-    // pass pending.id as referenceId so webhook can map payment -> pending listing
+    // pass pending.id as idempotency/referenceId so webhook can map payment -> pending listing
     const checkout = await createCheckoutLink(Number(100), redirectUrl, pending.id)
     // return checkout page url
     return res.status(200).json({ checkoutUrl: checkout.checkout.checkoutPageUrl, pendingId: pending.id })

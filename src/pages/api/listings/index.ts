@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     // simple browse: return listings within radius of Southport center
     const listings = await prisma.listing.findMany({ where: { sold: false }, include: { images: true } })
-    const filtered = listings.filter((l) => {
+    const filtered = listings.filter((l: any) => {
       const dist = milesBetween(SOUTHPORT_LAT, SOUTHPORT_LNG, l.lat, l.lng)
       return dist <= MAX_DISTANCE_MILES
     })
