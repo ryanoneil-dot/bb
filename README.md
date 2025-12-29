@@ -1,5 +1,7 @@
 # Builders Bargains — Production-ready scaffold
 
+![CI](https://github.com/ryanoneil-dot/bb/actions/workflows/ci.yml/badge.svg)
+
 This repository is a production-ready scaffold for Builders Bargains: a local marketplace for builders and tradespeople in Southport, UK.
 
 Quick setup (development):
