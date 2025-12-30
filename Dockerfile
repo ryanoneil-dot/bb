@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --ignore-scripts
 COPY prisma ./prisma
-RUN npx prisma@5.4.0 generate
+RUN DATABASE_URL="postgresql://user:pass@localhost:5432/db" npx prisma@5.4.0 generate --schema=prisma/schema.prisma
 COPY . .
 RUN npm run build
 RUN npm prune --omit=dev

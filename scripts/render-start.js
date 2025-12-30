@@ -19,7 +19,7 @@ if (fs.existsSync(migrationsDir)) {
   console.log('Migrations directory not found')
 }
 
-run('npx', ['prisma', 'generate', '--schema=prisma/schema.prisma'])
-run('npx', ['prisma', 'migrate', 'deploy', '--schema=prisma/schema.prisma'])
-run('npx', ['prisma', 'migrate', 'status', '--schema=prisma/schema.prisma'])
+run('npx', ['prisma@5.4.0', 'generate', '--schema=prisma/schema.prisma'])
+run('npx', ['prisma@5.4.0', 'migrate', 'deploy', '--schema=prisma/schema.prisma'])
+run('npx', ['prisma@5.4.0', 'migrate', 'status', '--schema=prisma/schema.prisma'])
 run('npx', ['next', 'start', '-p', port])
