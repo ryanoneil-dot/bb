@@ -2,8 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../lib/prisma'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // This is the redirect target after Square checkout completes.
-  // For a secure production flow, verify payment via webhooks or Square APIs.
   const { pendingId } = req.query
   if (!pendingId || typeof pendingId !== 'string') return res.status(400).send('Missing pendingId')
 
@@ -14,9 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.redirect(`/account`)
   }
 
-  // Create actual listing from pending
   const images: string[] = JSON.parse(pending.imagesJson || '[]')
-  const listing = await prisma.listing.create({
+  await prisma.listing.create({
     data: {
       sellerId: pending.sellerId,
       title: pending.title,
@@ -25,12 +22,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       lat: pending.lat,
       lng: pending.lng,
       images: { create: images.map((url) => ({ url })) },
+      contactName: pending.contactName,
+      contactPhone: pending.contactPhone,
     },
     include: { images: true },
   })
 
   await prisma.pendingListing.update({ where: { id: pending.id }, data: { status: 'completed' } })
 
-  // redirect user to account or listing page
   return res.redirect('/account')
 }

@@ -1,6 +1,5 @@
 import crypto from 'crypto'
 
-// Mock prisma client used by webhook handler
 const mockPending = {
   id: 'pending-1',
   sellerId: 'user-1',
@@ -11,6 +10,8 @@ const mockPending = {
   lng: -3.0050,
   imagesJson: JSON.stringify(['https://example.com/img1.jpg']),
   status: 'pending',
+  contactName: 'Sam Builder',
+  contactPhone: '07123456789',
 }
 
 const createdListing = { id: 'listing-1' }

@@ -1,14 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../lib/prisma'
+import { getSession } from 'next-auth/react'
 
 const SOUTHPORT_LAT = parseFloat(process.env.SOUTHPORT_LAT || '53.6458')
 const SOUTHPORT_LNG = parseFloat(process.env.SOUTHPORT_LNG || '-3.0050')
 const MAX_DISTANCE_MILES = parseFloat(process.env.MAX_DISTANCE_MILES || '15')
 
 function milesBetween(lat1: number, lon1: number, lat2: number, lon2: number) {
-  // Haversine
   const toRad = (x: number) => (x * Math.PI) / 180
-  const R = 3958.8 // miles
+  const R = 3958.8
   const dLat = toRad(lat2 - lat1)
   const dLon = toRad(lon2 - lon1)
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
@@ -18,8 +18,23 @@ function milesBetween(lat1: number, lon1: number, lat2: number, lon2: number) {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    // simple browse: return listings within radius of Southport center
-    const listings = await prisma.listing.findMany({ where: { sold: false }, include: { images: true } })
+    const mine = req.query.mine === 'true' || req.query.mine === '1'
+    if (mine) {
+      const session = await getSession({ req })
+      if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
+      const listings = await prisma.listing.findMany({
+        where: { sellerId: session.user.id },
+        include: { images: true },
+        orderBy: { createdAt: 'desc' },
+      })
+      return res.status(200).json(listings)
+    }
+
+    const listings = await prisma.listing.findMany({
+      where: { sold: false },
+      include: { images: true },
+      orderBy: { createdAt: 'desc' },
+    })
     const filtered = listings.filter((l: any) => {
       const dist = milesBetween(SOUTHPORT_LAT, SOUTHPORT_LNG, l.lat, l.lng)
       return dist <= MAX_DISTANCE_MILES
@@ -28,20 +43,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
-    // create listing (expects sellerId, title, pricePence, lat, lng)
-    const { sellerId, title, description, pricePence, lat, lng, images = [] } = req.body
-    if (!sellerId || !title || !pricePence || lat == null || lng == null) {
+    const session = await getSession({ req })
+    if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
+
+    const { title, description, pricePence, lat, lng, images = [], contactName, contactPhone } = req.body
+    const parsedPrice = Number(pricePence)
+    const parsedLat = Number(lat)
+    const parsedLng = Number(lng)
+    if (!title || !contactName || !contactPhone || Number.isNaN(parsedPrice) || Number.isNaN(parsedLat) || Number.isNaN(parsedLng)) {
       return res.status(400).json({ error: 'Missing fields' })
     }
     const listing = await prisma.listing.create({
       data: {
-        sellerId,
+        sellerId: session.user.id,
         title,
         description,
-        pricePence,
-        lat: parseFloat(lat),
-        lng: parseFloat(lng),
+        pricePence: parsedPrice,
+        lat: parsedLat,
+        lng: parsedLng,
         images: { create: images.map((url: string) => ({ url })) },
+        contactName,
+        contactPhone,
       },
       include: { images: true },
     })

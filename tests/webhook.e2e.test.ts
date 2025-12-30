@@ -1,7 +1,6 @@
 import { createMocks } from 'node-mocks-http'
 import crypto from 'crypto'
 
-// Prepare a mocked prisma module before importing the handler to avoid requiring a generated client.
 const mockPending = {
   id: 'pending-1',
   sellerId: 'user-1',
@@ -12,6 +11,8 @@ const mockPending = {
   lng: -3.0050,
   imagesJson: JSON.stringify(['https://example.com/img1.jpg']),
   status: 'pending',
+  contactName: 'Sam Builder',
+  contactPhone: '07123456789',
 }
 
 const createdListing = { id: 'listing-1' }
@@ -35,7 +36,6 @@ const mockPrisma = {
 
 jest.mock('../src/lib/prisma', () => ({ prisma: mockPrisma }))
 
-// Import the handler after mocking prisma
 const handlerModule = require('../src/pages/api/payments/webhook')
 const handler = handlerModule.default
 const { verifySignature } = handlerModule
@@ -59,7 +59,6 @@ describe('webhook API (e2e)', () => {
       body: payload,
     })
 
-    // node-mocks-http doesn't provide raw body by default; attach it so our handler's raw-body logic can use it.
     ;(req as any).rawBody = raw
 
     await handler(req as any, res as any)

@@ -15,6 +15,8 @@ export default function CreateListing() {
   const [lng, setLng] = useState(String(DEFAULT_LNG))
   const [imagesText, setImagesText] = useState('')
   const [files, setFiles] = useState<FileList | null>(null)
+  const [contactName, setContactName] = useState('')
+  const [contactPhone, setContactPhone] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
@@ -64,6 +66,8 @@ export default function CreateListing() {
         lat: parseFloat(lat),
         lng: parseFloat(lng),
         images,
+        contactName,
+        contactPhone,
       }
 
       const res = await fetch('/api/payments/create-checkout', {
@@ -108,6 +112,12 @@ export default function CreateListing() {
           <label style={{ display: 'block', marginTop: 8 }}>Price (£)</label>
           <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 15.00" required style={{ width: 160 }} />
 
+          <label style={{ display: 'block', marginTop: 8 }}>Contact name</label>
+          <input value={contactName} onChange={(e) => setContactName(e.target.value)} required />
+
+          <label style={{ display: 'block', marginTop: 8 }}>Contact phone</label>
+          <input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required />
+
           <label style={{ display: 'block', marginTop: 8 }}>Latitude</label>
           <input value={lat} onChange={(e) => setLat(e.target.value)} style={{ width: 160 }} />
 
@@ -122,7 +132,7 @@ export default function CreateListing() {
           {error && <p style={{ color: 'red' }}>{error}</p>}
 
           <button type="submit" disabled={loading} style={{ marginTop: 12 }}>
-            {loading ? 'Creating…' : 'Create listing'}
+            {loading ? 'Creating…' : 'Pay £1 and publish'}
           </button>
         </form>
 

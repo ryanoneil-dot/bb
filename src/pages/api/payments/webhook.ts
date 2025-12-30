@@ -5,7 +5,6 @@ import crypto from 'crypto'
 export const config = { api: { bodyParser: false } }
 
 async function getRawBody(req: NextApiRequest) {
-  // If a testing harness attached `rawBody`, use it (node-mocks-http, etc.).
   if ((req as any).rawBody) return (req as any).rawBody
 
   const chunks: Buffer[] = []
@@ -25,7 +24,6 @@ export function verifySignature(rawBody: Buffer, signatureHeader?: string | stri
   hmac.update(rawBody)
   const expected = hmac.digest('base64')
 
-  // Accept either base64 or hex encoded header values
   if (signature === expected) return true
   const hexExpected = Buffer.from(expected, 'base64').toString('hex')
   if (signature === hexExpected) return true
@@ -33,37 +31,31 @@ export function verifySignature(rawBody: Buffer, signatureHeader?: string | stri
 }
 
 export async function handleWebhookPayload(payload: any) {
-  // Basic handling: look for payment created/completed events and map via referenceId
   try {
-    // Persist raw webhook payload for audit / reconciliation. Compute a stable payload hash.
     const rawJson = JSON.stringify(payload)
     const payloadHash = crypto.createHash('sha256').update(rawJson).digest('hex')
 
-    // If we've already processed this payload, no-op
     const existing = await prisma.webhookEvent.findUnique({ where: { payloadHash } }).catch(() => null)
     if (existing && existing.processed) return
 
-    // create or upsert event
     const payloadToSave = typeof payload === 'string' ? payload : JSON.stringify(payload)
+    const payloadJson = typeof payload === 'string' ? null : payload
     await prisma.webhookEvent.upsert({
       where: { payloadHash },
-      create: { source: 'SQUARE', eventId: payload?.event_id || null, signature: null, payload: payloadToSave as any, payloadHash, processed: false },
-      update: { payload: payloadToSave as any },
+      create: { source: 'SQUARE', eventId: payload?.event_id || null, signature: null, payload: payloadToSave as any, payloadJson, payloadHash, processed: false },
+      update: { payload: payloadToSave as any, payloadJson },
     })
 
-    // Attempt to extract referenceId from common locations
     const referenceId = payload?.data?.object?.payment?.order_id || payload?.data?.object?.order?.reference_id || payload?.data?.object?.checkout?.reference_id || payload?.data?.object?.order?.referenceId || payload?.data?.object?.order?.referenceId
 
     if (referenceId) {
       const pending = await prisma.pendingListing.findUnique({ where: { id: referenceId } })
       if (pending && pending.status !== 'completed') {
-        // Ensure seller exists (create placeholder user during local dev if missing)
         const seller = await prisma.user.findUnique({ where: { id: pending.sellerId } })
         if (!seller) {
           await prisma.user.create({ data: { id: pending.sellerId, email: `${pending.sellerId}@dev.local`, name: 'Dev User' } })
         }
 
-        // Create listing
         const images: string[] = JSON.parse(pending.imagesJson || '[]')
         await prisma.listing.create({
           data: {
@@ -74,10 +66,11 @@ export async function handleWebhookPayload(payload: any) {
             lat: pending.lat,
             lng: pending.lng,
             images: { create: images.map((url) => ({ url })) },
+            contactName: pending.contactName,
+            contactPhone: pending.contactPhone,
           },
         })
         await prisma.pendingListing.update({ where: { id: pending.id }, data: { status: 'completed' } })
-        // mark webhook event processed
         await prisma.webhookEvent.updateMany({ where: { payloadHash }, data: { processed: true } })
       }
     }

@@ -27,6 +27,10 @@ export default function ListingDetail() {
             <img src={image} alt={data.title} style={{ width: '100%', height: 320, objectFit: 'cover', borderRadius: 10 }} />
           </div>
         )}
+        <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #eee' }}>
+          <div><strong>Contact name:</strong> {data.contactName}</div>
+          <div><strong>Phone:</strong> {data.contactPhone}</div>
+        </div>
       </div>
     </main>
   )

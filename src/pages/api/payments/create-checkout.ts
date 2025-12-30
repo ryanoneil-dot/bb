@@ -1,23 +1,33 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../lib/prisma'
 import { createCheckoutLink } from '../../../lib/square'
+import { getSession } from 'next-auth/react'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const { sellerId, title, description, pricePence, lat, lng, images = [] } = req.body
-  if (!sellerId || !title || !pricePence) return res.status(400).json({ error: 'Missing fields' })
+  const session = await getSession({ req })
+  if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
 
-  // create pending listing
+  const { title, description, pricePence, lat, lng, images = [], contactName, contactPhone } = req.body
+  const parsedPrice = Number(pricePence)
+  const parsedLat = Number(lat)
+  const parsedLng = Number(lng)
+  if (!title || !contactName || !contactPhone || Number.isNaN(parsedPrice) || Number.isNaN(parsedLat) || Number.isNaN(parsedLng)) {
+    return res.status(400).json({ error: 'Missing fields' })
+  }
+
   const pending = await prisma.pendingListing.create({
     data: {
-      sellerId,
+      sellerId: session.user.id,
       title,
       description,
-      pricePence: Number(pricePence),
-      lat: Number(lat),
-      lng: Number(lng),
+      pricePence: parsedPrice,
+      lat: parsedLat,
+      lng: parsedLng,
       imagesJson: JSON.stringify(images),
+      contactName,
+      contactPhone,
     },
   })
 
@@ -25,9 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const redirectUrl = `${redirectBase}/api/payments/complete?pendingId=${pending.id}`
 
   try {
-    // pass pending.id as idempotency/referenceId so webhook can map payment -> pending listing
     const checkout = await createCheckoutLink(Number(100), redirectUrl, pending.id)
-    // return checkout page url
     return res.status(200).json({ checkoutUrl: checkout.checkout.checkoutPageUrl, pendingId: pending.id })
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Checkout error' })
