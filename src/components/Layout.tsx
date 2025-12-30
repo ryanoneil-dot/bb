@@ -17,9 +17,16 @@ export default function Layout({ children }: { children: ReactNode }) {
         </Link>
         <div className="top-actions">
           {session ? (
-            <Link className="btn-outline" href="/account">Account</Link>
+            <>
+              <Link className="btn-primary" href="/create">Sell</Link>
+              <Link className="btn-outline" href="/account/listings">My Listings</Link>
+              <Link className="btn-outline" href="/account">Account</Link>
+            </>
           ) : (
-            <Link className="btn-outline" href="/auth/signin">Sign In</Link>
+            <>
+              <Link className="btn-primary" href="/auth/signin">Sell</Link>
+              <Link className="btn-outline" href="/auth/signin">Sign In</Link>
+            </>
           )}
         </div>
       </header>

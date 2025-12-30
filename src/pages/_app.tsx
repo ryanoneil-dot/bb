@@ -61,6 +61,13 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
           z-index: 10;
         }
 
+        .top-actions {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
         .brand {
           display: flex;
           align-items: center;
@@ -108,6 +115,19 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
           text-decoration: none;
           font-weight: 600;
           background: #fff;
+        }
+
+        .btn-primary {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 16px;
+          border-radius: 10px;
+          color: #fff;
+          text-decoration: none;
+          font-weight: 700;
+          background: var(--brand);
+          border: 2px solid var(--brand);
         }
 
         .content {
