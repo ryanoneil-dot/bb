@@ -10,4 +10,5 @@ function run(cmd, args) {
 const port = process.env.PORT || '3000'
 
 run('npx', ['prisma', 'generate'])
+run('npx', ['prisma', 'migrate', 'deploy'])
 run('npx', ['next', 'start', '-p', port])
