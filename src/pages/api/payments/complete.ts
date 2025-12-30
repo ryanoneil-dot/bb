@@ -18,6 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       sellerId: pending.sellerId,
       title: pending.title,
       description: pending.description,
+      category: pending.category,
       pricePence: pending.pricePence,
       lat: pending.lat,
       lng: pending.lng,

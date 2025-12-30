@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import Head from 'next/head'
 import ListingCard from '../components/ListingCard'
 
@@ -9,6 +9,18 @@ const categories = ['All', 'Timber', 'Masonry', 'Plumbing', 'Electrical', 'Tools
 
 export default function Home() {
   const { data, error } = useSWR('/api/listings', fetcher)
+  const [selected, setSelected] = useState('All')
+  const [query, setQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    if (!Array.isArray(data)) return []
+    return data.filter((listing: any) => {
+      const matchesCategory = selected === 'All' || listing.category === selected
+      const haystack = `${listing.title || ''} ${listing.description || ''}`.toLowerCase()
+      const matchesQuery = !query.trim() || haystack.includes(query.trim().toLowerCase())
+      return matchesCategory && matchesQuery
+    })
+  }, [data, selected, query])
 
   return (
     <>
@@ -27,15 +39,24 @@ export default function Home() {
           </p>
           <div className="search">
             <span className="search-icon">🔍</span>
-            <input className="search-input" placeholder="Search for timber, bricks, tiles..." />
+            <input
+              className="search-input"
+              placeholder="Search for timber, bricks, tiles..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
           </div>
         </div>
       </section>
 
       <section className="filters">
         <div className="pill-row">
-          {categories.map((cat, i) => (
-            <button key={cat} className={`pill ${i === 0 ? 'pill-active' : ''}`}>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              className={`pill ${selected === cat ? 'pill-active' : ''}`}
+              onClick={() => setSelected(cat)}
+            >
               {cat}
             </button>
           ))}
@@ -45,13 +66,13 @@ export default function Home() {
       <section className="content">
         <div className="listings-header">
           <h2>Latest bargains</h2>
-          <span className="count">{Array.isArray(data) ? `${data.length} items found` : ''}</span>
+          <span className="count">{Array.isArray(data) ? `${filtered.length} items found` : ''}</span>
         </div>
         {error && <div className="error">Failed to load listings</div>}
         {!data && !error && <div className="loading">Loading...</div>}
         {Array.isArray(data) && (
           <div className="grid">
-            {data.map((listing: any) => (
+            {filtered.map((listing: any) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}
           </div>

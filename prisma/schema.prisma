@@ -9,19 +9,23 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  accounts  Account[]
-  sessions  Session[]
-  listings  Listing[]
-  createdAt DateTime @default(now())
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  passwordHash       String   @default("")
+  name               String?
+  securityQuestion   String   @default("")
+  securityAnswerHash String   @default("")
+  accounts           Account[]
+  sessions           Session[]
+  listings           Listing[]
+  createdAt          DateTime @default(now())
 }
 
 model Listing {
   id          String   @id @default(cuid())
   title       String
   description String?
+  category    String   @default("All")
   pricePence  Int
   currency    String   @default("GBP")
   images      Image[]
@@ -56,6 +60,7 @@ model PendingListing {
   contactPhone String
   title       String
   description String?
+  category    String   @default("All")
   pricePence  Int
   lat         Float
   lng         Float

@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getSession({ req })
     if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
 
-    const { title, description, pricePence, lat, lng, images = [], contactName, contactPhone } = req.body
+    const { title, description, category, pricePence, lat, lng, images = [], contactName, contactPhone } = req.body
     const parsedPrice = Number(pricePence)
     const parsedLat = Number(lat)
     const parsedLng = Number(lng)
@@ -58,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         sellerId: session.user.id,
         title,
         description,
+        category: category || 'All',
         pricePence: parsedPrice,
         lat: parsedLat,
         lng: parsedLng,

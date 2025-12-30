@@ -62,6 +62,7 @@ export async function handleWebhookPayload(payload: any) {
             sellerId: pending.sellerId,
             title: pending.title,
             description: pending.description,
+            category: pending.category,
             pricePence: pending.pricePence,
             lat: pending.lat,
             lng: pending.lng,

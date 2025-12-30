@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 export default function Account() {
   const { data: session, status } = useSession()
+  const isAdmin = session?.user?.email === 'aat'
 
   if (status === 'loading') return <div className="content">Loading...</div>
   if (!session) return (
@@ -26,6 +27,11 @@ export default function Account() {
         <div style={{ marginTop: 8 }}>
           <Link href="/account/listings" className="btn-outline">Manage listings</Link>
         </div>
+        {isAdmin && (
+          <div style={{ marginTop: 8 }}>
+            <Link href="/admin" className="btn-outline">Admin dashboard</Link>
+          </div>
+        )}
         <button style={{ marginTop: 12 }} onClick={() => signOut({ callbackUrl: '/' })}>Sign out</button>
       </div>
     </main>

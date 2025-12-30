@@ -14,8 +14,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!session || !isAdmin(session.user?.email)) return res.status(403).json({ error: 'Forbidden' })
 
   if (req.method === 'GET') {
-    const reports = await prisma.report.findMany({ orderBy: { createdAt: 'desc' } })
-    return res.status(200).json(reports)
+    const listings = await prisma.listing.findMany({
+      include: { images: true, seller: true },
+      orderBy: { createdAt: 'desc' },
+    })
+    return res.status(200).json(listings)
   }
 
   res.setHeader('Allow', ['GET'])

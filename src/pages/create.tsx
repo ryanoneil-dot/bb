@@ -5,11 +5,13 @@ import CheckoutPreview from '../components/CheckoutPreview'
 
 const DEFAULT_LAT = 53.6458
 const DEFAULT_LNG = -3.0050
+const categories = ['All', 'Timber', 'Masonry', 'Plumbing', 'Electrical', 'Tools', 'Paint', 'Landscaping']
 
 export default function CreateListing() {
   const { data: session, status } = useSession()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
+  const [category, setCategory] = useState('All')
   const [price, setPrice] = useState('')
   const [lat, setLat] = useState(String(DEFAULT_LAT))
   const [lng, setLng] = useState(String(DEFAULT_LNG))
@@ -62,6 +64,7 @@ export default function CreateListing() {
       const body = {
         title,
         description,
+        category,
         pricePence: Math.round((parseFloat(price) || 0) * 100),
         lat: parseFloat(lat),
         lng: parseFloat(lng),
@@ -108,6 +111,13 @@ export default function CreateListing() {
 
           <label style={{ display: 'block', marginTop: 8 }}>Description</label>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
+
+          <label style={{ display: 'block', marginTop: 8 }}>Category</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
 
           <label style={{ display: 'block', marginTop: 8 }}>Price (£)</label>
           <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 15.00" required style={{ width: 160 }} />
