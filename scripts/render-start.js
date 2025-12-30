@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 const { spawnSync } = require('child_process')
+const fs = require('fs')
+const path = require('path')
 
 function run(cmd, args) {
   const bin = process.platform === 'win32' ? `${cmd}.cmd` : cmd
@@ -9,6 +11,15 @@ function run(cmd, args) {
 
 const port = process.env.PORT || '3000'
 
-run('npx', ['prisma', 'generate'])
-run('npx', ['prisma', 'migrate', 'deploy'])
+const migrationsDir = path.join(__dirname, '..', 'prisma', 'migrations')
+if (fs.existsSync(migrationsDir)) {
+  const entries = fs.readdirSync(migrationsDir).filter((name) => !name.startsWith('.'))
+  console.log(`Migrations found: ${entries.length}`)
+} else {
+  console.log('Migrations directory not found')
+}
+
+run('npx', ['prisma', 'generate', '--schema=prisma/schema.prisma'])
+run('npx', ['prisma', 'migrate', 'deploy', '--schema=prisma/schema.prisma'])
+run('npx', ['prisma', 'migrate', 'status', '--schema=prisma/schema.prisma'])
 run('npx', ['next', 'start', '-p', port])
