@@ -4,23 +4,30 @@ import Link from 'next/link'
 export default function Account() {
   const { data: session, status } = useSession()
 
-  if (status === 'loading') return <div>Loading...</div>
+  if (status === 'loading') return <div className="content">Loading...</div>
   if (!session) return (
-    <main style={{ padding: 20 }}>
-      <h2>Not signed in</h2>
-      <Link href="/auth/signin">Sign in</Link>
+    <main className="content">
+      <div className="panel" style={{ maxWidth: 520, margin: '40px auto' }}>
+        <h2>Not signed in</h2>
+        <Link href="/auth/signin" className="btn-outline">Sign in</Link>
+      </div>
     </main>
   )
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>Account</h1>
-      <p>Signed in as {session.user?.email}</p>
-      <p>User ID: {session.user?.id}</p>
-      <div style={{ marginTop: 12 }}>
-        <Link href="/create">Create listing</Link>
+    <main className="content">
+      <div className="panel" style={{ maxWidth: 640, margin: '20px auto' }}>
+        <h1 style={{ marginTop: 0 }}>Account</h1>
+        <p>Signed in as {session.user?.email}</p>
+        <p>User ID: {session.user?.id}</p>
+        <div style={{ marginTop: 12 }}>
+          <Link href="/create" className="btn-outline">Create listing</Link>
+        </div>
+        <div style={{ marginTop: 8 }}>
+          <Link href="/account/listings" className="btn-outline">Manage listings</Link>
+        </div>
+        <button style={{ marginTop: 12 }} onClick={() => signOut({ callbackUrl: '/' })}>Sign out</button>
       </div>
-      <button style={{ marginTop: 12 }} onClick={() => signOut({ callbackUrl: '/' })}>Sign out</button>
     </main>
   )
 }

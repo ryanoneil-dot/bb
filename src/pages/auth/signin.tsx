@@ -12,17 +12,19 @@ export default function SignIn() {
   }
 
   return (
-    <main style={{ padding: 20, fontFamily: 'sans-serif' }}>
-      <h1>Sign in — Builders Bargains</h1>
-      {!sent ? (
-        <form onSubmit={submit} style={{ maxWidth: 400 }}>
-          <label style={{ display: 'block', marginBottom: 8 }}>Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" style={{ width: '100%', padding: 8 }} />
-          <button style={{ marginTop: 12, padding: '8px 12px' }} type="submit">Send magic link</button>
-        </form>
-      ) : (
-        <p>Check your email for a sign-in link.</p>
-      )}
+    <main className="content">
+      <div className="panel" style={{ maxWidth: 420, margin: '40px auto' }}>
+        <h1 style={{ marginTop: 0 }}>Sign in</h1>
+        {!sent ? (
+          <form onSubmit={submit}>
+            <label style={{ display: 'block', marginBottom: 8 }}>Email</label>
+            <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
+            <button style={{ marginTop: 12 }} type="submit">Send magic link</button>
+          </form>
+        ) : (
+          <p>Check your email for a sign-in link.</p>
+        )}
+      </div>
     </main>
   )
 }

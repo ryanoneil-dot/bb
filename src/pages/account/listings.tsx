@@ -5,15 +5,19 @@ export default function MyListings() {
   const { data: session } = useSession()
   const [listings, setListings] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function load() {
-      const res = await fetch('/api/listings')
-      if (!res.ok) return
+      setError(null)
+      const res = await fetch('/api/listings?mine=true')
+      if (!res.ok) {
+        setError('Failed to load listings.')
+        setLoading(false)
+        return
+      }
       const data = await res.json()
-      // filter to user's listings
-      const mine = data.filter((l: any) => l.sellerId === session?.user?.id)
-      setListings(mine)
+      setListings(data)
       setLoading(false)
     }
     if (session) load()
@@ -30,26 +34,27 @@ export default function MyListings() {
     setListings((s) => s.map((l) => (l.id === id ? { ...l, sold: true } : l)))
   }
 
-  if (!session) return <div>Please sign in to manage listings.</div>
-  if (loading) return <div>Loading…</div>
+  if (!session) return <div className="content">Please sign in to manage listings.</div>
+  if (loading) return <div className="content">Loading…</div>
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>My listings</h1>
-      {listings.length === 0 && <p>No listings</p>}
-      <ul>
-        {listings.map((l) => (
-          <li key={l.id} style={{ marginBottom: 12 }}>
-            <strong>{l.title}</strong> — £{(l.pricePence / 100).toFixed(2)} {l.sold ? '(SOLD)' : ''}
-            <div>
-              <button onClick={() => markSold(l.id)} disabled={l.sold} style={{ marginRight: 8 }}>
-                Mark sold
-              </button>
-              <button onClick={() => del(l.id)} style={{ marginRight: 8 }}>Delete</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+    <main className="content">
+      <div className="panel">
+        <h1 style={{ marginTop: 0 }}>My listings</h1>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {listings.length === 0 && <p>No listings</p>}
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {listings.map((l) => (
+            <li key={l.id} style={{ marginBottom: 12, padding: 12, borderBottom: '1px solid #eee' }}>
+              <strong>{l.title}</strong> — £{(l.pricePence / 100).toFixed(2)} {l.sold ? '(SOLD)' : ''}
+              <div style={{ marginTop: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button onClick={() => markSold(l.id)} disabled={l.sold}>Mark sold</button>
+                <button onClick={() => del(l.id)} style={{ background: '#2a2f37' }}>Delete</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </main>
   )
 }

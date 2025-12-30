@@ -15,19 +15,21 @@ export default function AdminReports() {
     if (session) load()
   }, [session])
 
-  if (!session) return <div>Please sign in.</div>
+  if (!session) return <div className="content">Please sign in.</div>
 
   return (
-    <main style={{ padding: 20 }}>
-      <h1>Reports</h1>
-      {reports.length === 0 && <p>No reports</p>}
-      <ul>
-        {reports.map((r) => (
-          <li key={r.id} style={{ marginBottom: 12 }}>
-            Listing: {r.listingId} — {r.reason} — {new Date(r.createdAt).toLocaleString()}
-          </li>
-        ))}
-      </ul>
+    <main className="content">
+      <div className="panel">
+        <h1 style={{ marginTop: 0 }}>Reports</h1>
+        {reports.length === 0 && <p>No reports</p>}
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {reports.map((r) => (
+            <li key={r.id} style={{ marginBottom: 12, padding: 12, borderBottom: '1px solid #eee' }}>
+              Listing: {r.listingId} — {r.reason} — {new Date(r.createdAt).toLocaleString()}
+            </li>
+          ))}
+        </ul>
+      </div>
     </main>
   )
 }
