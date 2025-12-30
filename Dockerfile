@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci --ignore-scripts
 COPY prisma ./prisma
-RUN npx prisma generate
+RUN npx prisma.4.0 generate
 COPY . .
 RUN npm run build
 RUN npm prune --omit=dev
