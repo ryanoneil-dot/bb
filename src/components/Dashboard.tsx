@@ -23,7 +23,7 @@ type Category = {
 
 const STORAGE_KEY = "aat:dashboard:v1";
 
-export default function Dashboard {
+export default function Dashboard() {
   const defaultCats: Category[] = [
     { id: "c-1", title: "General", items: [] },
     { id: "c-2", title: "Work", items: [] },
