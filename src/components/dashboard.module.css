@@ -1,0 +1,77 @@
+.page {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: #0f172a;
+  padding: 20px;
+  background: linear-gradient(180deg, #f6fbff 0%, #f2f7fb 100%);
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.controls button {
+  margin-left: 8px;
+}
+
+.btnActive {
+  background: #0ea5e9;
+  color: white;
+}
+
+.main {
+  display: flex;
+  gap: 20px;
+}
+
+.widgets {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.widget {
+  background: linear-gradient(180deg,#fff,#f7fbff);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+}
+
+.widgetClock .time {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.date { color:#475569; }
+
+.calendarSmall { min-width: 240px; }
+.calendarGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top:8px; }
+.calendarCell { text-align:center; padding:6px; border-radius:6px; background:#fff; color:#0f172a; font-size:12px }
+
+.categories { flex: 1; display: flex; gap: 16px; align-items: flex-start; }
+.category { background: linear-gradient(180deg,#ffffff,#f8fbff); border-radius:12px; padding:12px; min-width:260px; box-shadow: 0 6px 18px rgba(2,6,23,0.04); }
+.categoryHeader { display:flex; justify-content: space-between; align-items:center; gap:8px }
+.titleInput { font-size:16px; padding:4px; }
+
+.grid { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px }
+.gridLocked { display:grid; grid-template-columns: repeat(3,110px); gap:10px; margin-top:12px }
+
+.shortcut { background: linear-gradient(180deg,#fff,#f3f8ff); border-radius:10px; padding:10px; cursor:grab; min-width:90px; min-height:90px; resize: both; overflow:auto; box-shadow: 0 6px 14px rgba(2,6,23,0.06); }
+.shortcutInner { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.icon { font-size:28px }
+.label { margin-top:8px; font-weight:600; text-align:center }
+
+.resizerWrap { position:relative }
+.resizerCorner { width:12px; height:12px; background:rgba(0,0,0,0.12); position:absolute; right:6px; bottom:6px; border-radius:2px; cursor:se-resize }
+.resizer { position:absolute; right:0; bottom:0; width:28px; height:28px; cursor:se-resize; opacity:0 }
+
+.fileLabel { margin-left:8px; cursor:pointer }
+
+.weatherHead { font-weight:700; margin-bottom:6px }
+.weatherMain { font-size:20px }
+.forecastList { margin-top:6px }
+.forecastItem { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eef2ff }
