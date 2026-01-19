@@ -15,7 +15,6 @@ export default function CreateListing() {
   const [price, setPrice] = useState('')
   const [lat, setLat] = useState(String(DEFAULT_LAT))
   const [lng, setLng] = useState(String(DEFAULT_LNG))
-  const [imagesText, setImagesText] = useState('')
   const [files, setFiles] = useState<FileList | null>(null)
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
@@ -36,11 +35,6 @@ export default function CreateListing() {
     setError(null)
     setLoading(true)
     try {
-      const fromText = imagesText
-        .split('\n')
-        .map((s) => s.trim())
-        .filter(Boolean)
-
       const uploaded: string[] = []
       if (files && files.length > 0) {
         for (let i = 0; i < files.length; i++) {
@@ -59,7 +53,7 @@ export default function CreateListing() {
         }
       }
 
-      const images = [...uploaded, ...fromText]
+      const images = [...uploaded]
 
       const body = {
         title,
@@ -136,8 +130,6 @@ export default function CreateListing() {
 
           <label style={{ display: 'block', marginTop: 8 }}>Images</label>
           <input type="file" accept="image/*" multiple onChange={(e) => setFiles(e.target.files)} />
-          <small style={{ display: 'block', marginTop: 6, color: '#666' }}>Or paste image URLs (one per line)</small>
-          <textarea value={imagesText} onChange={(e) => setImagesText(e.target.value)} rows={4} placeholder="https://...\nhttps://..." />
 
           {error && <p style={{ color: 'red' }}>{error}</p>}
 
