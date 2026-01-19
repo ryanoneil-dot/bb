@@ -159,7 +159,7 @@ export default function Dashboard() {
   function handleAddLink(categoryId: string, title: string, url: string) {
     const id = `i-${Date.now()}`;
     const next = categories.map((c) =>
-      c.id === categoryId ? { ...c, items: [...c.items, { id, type: "link", title, url }] } : c
+      c.id === categoryId ? { ...c, items: [...c.items, { id, type: "link" as const, title, url }] } : c
     );
     applyAndPush(next);
   }
@@ -172,7 +172,7 @@ export default function Dashboard() {
       const dataUrl = reader.result as string;
       const next = categories.map((c) =>
         c.id === categoryId
-          ? { ...c, items: [...c.items, { id, type: "file", title, fileName: title, url: dataUrl }] }
+          ? { ...c, items: [...c.items, { id, type: "file" as const, title, fileName: title, url: dataUrl }] }
           : c
       );
       applyAndPush(next);
