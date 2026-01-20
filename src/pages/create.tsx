@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useSession, signIn } from 'next-auth/react'
-import SquareBuyButton from '../components/SquareBuyButton'
 import CheckoutPreview from '../components/CheckoutPreview'
 
 const DEFAULT_LAT = 53.6458
@@ -137,11 +136,6 @@ export default function CreateListing() {
             {loading ? 'Creating…' : 'Pay £1 and publish'}
           </button>
         </form>
-
-        <div style={{ marginTop: 18 }}>
-          <p style={{ color: '#666' }}>Quick test buy button (opens Square link):</p>
-          <SquareBuyButton />
-        </div>
 
         {checkoutUrl && <CheckoutPreview checkoutUrl={checkoutUrl} pendingId={pendingId || undefined} />}
       </div>
