@@ -29,9 +29,6 @@ export default function CheckoutPreview({ checkoutUrl, pendingId }: Props) {
         <button onClick={copy} aria-label="Copy checkout link" style={{ padding: '8px 12px', borderRadius: 6, border: '1px solid #ddd', background: '#fff' }}>
           {copied ? 'Copied!' : 'Copy link'}
         </button>
-        <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#006aff' }}>
-          Open in new tab
-        </a>
       </div>
 
       <div style={{ marginTop: 12 }}>

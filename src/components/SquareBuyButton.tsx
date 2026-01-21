@@ -25,8 +25,6 @@ export default function SquareBuyButton({ href, label }: Props) {
     >
       <div style={{ padding: 20 }}>
         <a
-          target="_blank"
-          rel="noopener noreferrer"
           href={url}
           style={{
             display: 'inline-block',
