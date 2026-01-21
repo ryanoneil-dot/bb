@@ -27,20 +27,21 @@ export default function AdminListings() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function load() {
-      setError(null)
-      const res = await fetch('/api/admin/listings', { credentials: 'include' })
-      if (!res.ok) {
-        setError('Failed to load listings.')
-        setLoading(false)
-        return
-      }
-      const data = await res.json()
-      setListings(data)
+  const loadListings = async () => {
+    setError(null)
+    const res = await fetch('/api/admin/listings', { credentials: 'include' })
+    if (!res.ok) {
+      setError('Failed to load listings.')
       setLoading(false)
+      return
     }
-    if (session) load()
+    const data = await res.json()
+    setListings(data)
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    if (session) loadListings()
   }, [session])
 
   async function updateListing(id: string, data: any) {
@@ -51,14 +52,14 @@ export default function AdminListings() {
       body: JSON.stringify(data),
     })
     if (!res.ok) return
-    const updated = await res.json()
-    setListings((s) => s.map((l) => (l.id === id ? { ...l, ...updated } : l)))
+    await loadListings()
   }
 
   async function del(id: string) {
     if (!confirm('Delete listing?')) return
-    await fetch(`/api/listings/${id}`, { method: 'DELETE', credentials: 'include' })
-    setListings((s) => s.filter((l) => l.id !== id))
+    const res = await fetch(`/api/listings/${id}`, { method: 'DELETE', credentials: 'include' })
+    if (!res.ok) return
+    await loadListings()
   }
 
   async function markSold(id: string) {

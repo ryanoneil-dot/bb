@@ -56,7 +56,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const listing = await prisma.listing.findUnique({ where: { id } })
     if (!listing) return res.status(404).json({ error: 'Not found' })
     if (!admin && listing.sellerId !== userId) return res.status(403).json({ error: 'Forbidden' })
-    await prisma.listing.delete({ where: { id } })
+    await prisma.$transaction([
+      prisma.image.deleteMany({ where: { listingId: id } }),
+      prisma.listing.delete({ where: { id } }),
+    ])
     return res.status(200).json({ deleted: true })
   }
 
