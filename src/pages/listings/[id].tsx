@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import useSWR from 'swr'
 import Link from 'next/link'
 
@@ -8,6 +9,7 @@ export default function ListingDetail() {
   const router = useRouter()
   const id = router.query.id
   const { data, error } = useSWR(id ? `/api/listings/${id}` : null, fetcher)
+  const [activeImage, setActiveImage] = useState<string | null>(null)
 
   if (error) return <div className="content">Failed to load listing.</div>
   if (!data) return <div className="content">Loading...</div>
@@ -26,7 +28,18 @@ export default function ListingDetail() {
         {images.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12, marginTop: 12 }}>
             {images.map((url) => (
-              <img key={url} src={url} alt={data.title} style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 10 }} />
+              <div
+                key={url}
+                role="button"
+                tabIndex={0}
+                onClick={() => setActiveImage(url)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') setActiveImage(url)
+                }}
+                style={{ cursor: 'zoom-in' }}
+              >
+                <img src={url} alt={data.title} style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 10, display: 'block' }} />
+              </div>
             ))}
           </div>
         )}
@@ -35,6 +48,28 @@ export default function ListingDetail() {
           <div><strong>Phone:</strong> {data.contactPhone}</div>
         </div>
       </div>
+      {activeImage && (
+        <div
+          role="presentation"
+          onClick={() => setActiveImage(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            zIndex: 50,
+          }}
+        >
+          <img
+            src={activeImage}
+            alt={data.title}
+            style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: 12, boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
+          />
+        </div>
+      )}
     </main>
   )
 }
