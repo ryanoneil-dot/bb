@@ -40,6 +40,7 @@ export default function CreateListing() {
           const file = files[i]
           const presignRes = await fetch('/api/uploads/presign', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ filename: file.name, contentType: file.type }),
           })
@@ -47,7 +48,9 @@ export default function CreateListing() {
           const presign = await presignRes.json()
           const putRes = await fetch(presign.url, { method: presign.method || 'PUT', headers: presign.headers || {}, body: file })
           if (!putRes.ok && putRes.status !== 200 && putRes.status !== 201) throw new Error('Upload failed')
-          const publicUrl = presign.key && process.env.NEXT_PUBLIC_S3_BASE_URL ? `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${presign.key}` : presign.url
+          const publicUrl =
+            presign.publicUrl ||
+            (presign.key && process.env.NEXT_PUBLIC_S3_BASE_URL ? `${process.env.NEXT_PUBLIC_S3_BASE_URL}/${presign.key}` : presign.url)
           uploaded.push(publicUrl)
         }
       }
@@ -68,6 +71,7 @@ export default function CreateListing() {
 
       const res = await fetch('/api/payments/create-checkout', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })

@@ -15,10 +15,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const userId = session?.user?.id || 'anon'
   const key = `uploads/${userId}/${cuid()}-${filename}`
+  const publicBaseUrl =
+    process.env.NEXT_PUBLIC_S3_BASE_URL ||
+    (process.env.S3_BUCKET && process.env.AWS_REGION
+      ? `https://${process.env.S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com`
+      : '')
+  const publicUrl = publicBaseUrl ? `${publicBaseUrl}/${key}` : undefined
 
   try {
     const presign = await getPresignedUploadUrl(key, contentType || 'image/jpeg')
-    return res.status(200).json({ ...presign, key })
+    return res.status(200).json({ ...presign, key, publicUrl })
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'presign error' })
   }
