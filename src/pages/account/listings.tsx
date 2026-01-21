@@ -32,8 +32,10 @@ export default function MyListings() {
   }
 
   async function markSold(id: string) {
-    await fetch(`/api/listings/${id}?action=mark-sold`, { method: 'POST' })
-    setListings((s) => s.map((l) => (l.id === id ? { ...l, sold: true } : l)))
+    const res = await fetch(`/api/listings/${id}?action=mark-sold`, { method: 'POST' })
+    if (!res.ok) return
+    const updated = await res.json()
+    setListings((s) => s.map((l) => (l.id === id ? { ...l, ...updated } : l)))
   }
 
   async function updateListing(id: string, data: any) {
@@ -60,7 +62,14 @@ export default function MyListings() {
           {listings.map((l) => (
             <li key={l.id} style={{ marginBottom: 16, padding: 12, borderBottom: '1px solid #eee' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
-                <strong>{l.title}</strong>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <img
+                    src={l.images?.[0]?.url || '/placeholder.png'}
+                    alt={l.title}
+                    style={{ width: 46, height: 46, objectFit: 'cover', borderRadius: 8, background: '#e3e6eb' }}
+                  />
+                  <strong>{l.title}</strong>
+                </div>
                 <span>£{(l.pricePence / 100).toFixed(2)} {l.sold ? '(SOLD)' : ''}</span>
               </div>
 
@@ -87,7 +96,7 @@ export default function MyListings() {
               <input defaultValue={l.contactPhone} onBlur={(e) => updateListing(l.id, { contactPhone: e.target.value })} />
 
               <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <button onClick={() => markSold(l.id)} disabled={l.sold}>Mark sold</button>
+                <button onClick={() => markSold(l.id)}>{l.sold ? 'Undo sold' : 'Mark sold'}</button>
                 <button onClick={() => del(l.id)} style={{ background: '#2a2f37' }}>Delete</button>
               </div>
             </li>
