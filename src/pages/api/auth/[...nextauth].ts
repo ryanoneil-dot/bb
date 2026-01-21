@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth'
+import type { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { prisma } from '../../../lib/prisma'
@@ -17,7 +18,7 @@ function verifySecret(value: string, stored: string) {
   return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(hashed, 'hex'))
 }
 
-export const authOptions: any = {
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma as any),
   providers: [
     CredentialsProvider({
@@ -30,7 +31,7 @@ export const authOptions: any = {
         securityAnswer: { label: 'Security Answer', type: 'text' },
         mode: { label: 'Mode', type: 'text' },
       },
-      async authorize(credentials: any) {
+      async authorize(credentials) {
         const email = credentials?.email?.toLowerCase().trim()
         const password = credentials?.password
         const mode = credentials?.mode
@@ -89,19 +90,21 @@ export const authOptions: any = {
   pages: { signIn: '/auth/signin' },
   session: { strategy: 'jwt' },
   callbacks: {
-    async jwt({ token, user }: any) {
-      if (user?.id) token.id = user.id
-      if (user?.email) token.email = user.email
-      if (user?.name) token.name = user.name
+    async jwt({ token, user }) {
+      const tokenWithId = token as typeof token & { id?: string; email?: string; name?: string }
+      if (user?.id) tokenWithId.id = user.id
+      if (user?.email) tokenWithId.email = user.email
+      if (user?.name) tokenWithId.name = user.name
       return token
     },
-    async session({ session, token }: any) {
+    async session({ session, token }) {
+      const tokenWithId = token as typeof token & { id?: string; email?: string; name?: string }
       return {
         ...session,
         user: {
-          id: token.id as string | undefined,
-          email: token.email as string | undefined,
-          name: token.name as string | undefined,
+          id: tokenWithId.id,
+          email: tokenWithId.email,
+          name: tokenWithId.name,
         },
       }
     },
