@@ -1,12 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../lib/prisma'
 import { createCheckoutLink } from '../../../lib/square'
-import { getSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '../auth/[...nextauth]'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const session = await getSession({ req })
+  const session = (await getServerSession(req, res, authOptions)) as any
   if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
 
   const { title, description, category, pricePence, lat, lng, images = [], contactName, contactPhone } = req.body
