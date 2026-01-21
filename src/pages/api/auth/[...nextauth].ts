@@ -96,7 +96,14 @@ export default NextAuth({
       return token
     },
     async session({ session, token }) {
-      return { ...session, user: { ...session.user, id: token.id } }
+      return {
+        ...session,
+        user: {
+          id: token.id as string | undefined,
+          email: token.email as string | undefined,
+          name: token.name as string | undefined,
+        },
+      }
     },
   },
 })
