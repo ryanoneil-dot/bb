@@ -30,6 +30,11 @@ export default function Layout({ children }: { children: ReactNode }) {
           )}
         </div>
       </header>
+      <div className="promo-banner">
+        <span className="promo-badge">Special offer</span>
+        <span className="promo-text">First 100 listings FREE with promo code</span>
+        <span className="promo-code">100</span>
+      </div>
       {children}
     </div>
   )

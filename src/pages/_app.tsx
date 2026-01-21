@@ -61,6 +61,47 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
           z-index: 10;
         }
 
+        .promo-banner {
+          position: sticky;
+          top: 70px;
+          z-index: 9;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 12px 16px;
+          background: linear-gradient(135deg, #ff7a1a, #ff9f1a);
+          color: #fff;
+          font-weight: 700;
+          letter-spacing: 0.3px;
+          text-transform: uppercase;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+          box-shadow: 0 12px 24px rgba(255, 122, 26, 0.25);
+          text-align: center;
+        }
+
+        .promo-badge {
+          background: #1f1f1f;
+          color: #fff;
+          padding: 4px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          letter-spacing: 1px;
+        }
+
+        .promo-text {
+          font-size: 14px;
+        }
+
+        .promo-code {
+          background: #fff;
+          color: #ff7a1a;
+          padding: 4px 10px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 800;
+        }
+
         .top-actions {
           display: flex;
           gap: 10px;
@@ -174,6 +215,13 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
         @media (max-width: 600px) {
           .topbar {
             padding: 16px;
+          }
+
+          .promo-banner {
+            top: 68px;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 12px;
           }
         }
       `}</style>
