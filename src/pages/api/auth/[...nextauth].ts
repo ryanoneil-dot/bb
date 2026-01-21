@@ -17,7 +17,7 @@ function verifySecret(value: string, stored: string) {
   return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(hashed, 'hex'))
 }
 
-export default NextAuth({
+export const authOptions = {
   adapter: PrismaAdapter(prisma as any),
   providers: [
     CredentialsProvider({
@@ -30,7 +30,7 @@ export default NextAuth({
         securityAnswer: { label: 'Security Answer', type: 'text' },
         mode: { label: 'Mode', type: 'text' },
       },
-      async authorize(credentials) {
+      async authorize(credentials: any) {
         const email = credentials?.email?.toLowerCase().trim()
         const password = credentials?.password
         const mode = credentials?.mode
@@ -89,13 +89,13 @@ export default NextAuth({
   pages: { signIn: '/auth/signin' },
   session: { strategy: 'jwt' },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: any) {
       if (user?.id) token.id = user.id
       if (user?.email) token.email = user.email
       if (user?.name) token.name = user.name
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token }: any) {
       return {
         ...session,
         user: {
@@ -106,4 +106,6 @@ export default NextAuth({
       }
     },
   },
-})
+}
+
+export default NextAuth(authOptions)
