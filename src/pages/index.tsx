@@ -5,7 +5,25 @@ import ListingCard from '../components/ListingCard'
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
-const categories = ['All', 'Timber', 'Masonry', 'Plumbing', 'Electrical', 'Tools', 'Paint', 'Landscaping']
+const categories = [
+  'All',
+  'Timber',
+  'Masonry',
+  'Plumbing',
+  'Electrical',
+  'Tools',
+  'Paint',
+  'Landscaping',
+  'Insulation',
+  'Roofing',
+  'Windows & Doors',
+  'Flooring',
+  'Garden & Outdoor',
+  'Bathrooms',
+  'Kitchens',
+  'Fixings & Hardware',
+  'Other',
+]
 
 export default function Home() {
   const { data, error } = useSWR('/api/listings', fetcher)

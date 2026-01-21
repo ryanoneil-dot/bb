@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 
-const categories = ['All', 'Timber', 'Masonry', 'Plumbing', 'Electrical', 'Tools', 'Paint', 'Landscaping']
+const categories = [
+  'All',
+  'Timber',
+  'Masonry',
+  'Plumbing',
+  'Electrical',
+  'Tools',
+  'Paint',
+  'Landscaping',
+  'Insulation',
+  'Roofing',
+  'Windows & Doors',
+  'Flooring',
+  'Garden & Outdoor',
+  'Bathrooms',
+  'Kitchens',
+  'Fixings & Hardware',
+  'Other',
+]
 
 export default function AdminListings() {
   const { data: session } = useSession()
@@ -91,6 +109,9 @@ export default function AdminListings() {
 
                 <label style={{ display: 'block', marginTop: 8 }}>Contact phone</label>
                 <input defaultValue={l.contactPhone} onBlur={(e) => updateListing(l.id, { contactPhone: e.target.value })} />
+
+                <label style={{ display: 'block', marginTop: 8 }}>Pickup area</label>
+                <input defaultValue={l.pickupArea || ''} onBlur={(e) => updateListing(l.id, { pickupArea: e.target.value })} />
               </div>
               <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <button onClick={() => markSold(l.id)}>{l.sold ? 'Undo sold' : 'Mark sold'}</button>

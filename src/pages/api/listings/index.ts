@@ -19,6 +19,11 @@ function milesBetween(lat1: number, lon1: number, lat2: number, lon2: number) {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
+    const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    await prisma.listing.deleteMany({
+      where: { sold: true, soldAt: { lt: cutoff } },
+    })
+
     const mine = req.query.mine === 'true' || req.query.mine === '1'
     if (mine) {
       const session = await getServerSession(req, res, authOptions)
@@ -32,7 +37,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const listings = await prisma.listing.findMany({
-      where: { sold: false },
+      where: {
+        OR: [
+          { sold: false },
+          { sold: true, soldAt: { gte: cutoff } },
+        ],
+      },
       include: { images: true },
       orderBy: { createdAt: 'desc' },
     })
@@ -47,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
 
-    const { title, description, category, pricePence, lat, lng, images = [], contactName, contactPhone } = req.body
+    const { title, description, category, pricePence, lat, lng, images = [], contactName, contactPhone, pickupArea } = req.body
     const parsedPrice = Number(pricePence)
     const parsedLat = Number(lat)
     const parsedLng = Number(lng)
@@ -66,6 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         images: { create: images.map((url: string) => ({ url })) },
         contactName,
         contactPhone,
+        pickupArea,
       },
       include: { images: true },
     })

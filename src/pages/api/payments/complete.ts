@@ -25,6 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       images: { create: images.map((url) => ({ url })) },
       contactName: pending.contactName,
       contactPhone: pending.contactPhone,
+      pickupArea: pending.pickupArea,
     },
     include: { images: true },
   })

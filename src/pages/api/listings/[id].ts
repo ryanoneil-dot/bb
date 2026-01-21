@@ -27,11 +27,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const admin = isAdmin(session.user?.email)
 
   if (req.method === 'PUT') {
-    const { title, description, pricePence, lat, lng, contactName, contactPhone, category, sold } = req.body
+    const { title, description, pricePence, lat, lng, contactName, contactPhone, category, sold, pickupArea } = req.body
     const listing = await prisma.listing.findUnique({ where: { id } })
     if (!listing) return res.status(404).json({ error: 'Not found' })
     if (!admin && listing.sellerId !== userId) return res.status(403).json({ error: 'Forbidden' })
 
+    const nextSold = typeof sold === 'boolean' ? sold : listing.sold
     const updated = await prisma.listing.update({
       where: { id },
       data: {
@@ -42,8 +43,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         lng: Number(lng),
         contactName,
         contactPhone,
+        pickupArea,
         category,
-        sold: typeof sold === 'boolean' ? sold : undefined,
+        sold: nextSold,
+        soldAt: nextSold ? listing.soldAt || new Date() : null,
       },
     })
     return res.status(200).json(updated)
@@ -61,7 +64,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const listing = await prisma.listing.findUnique({ where: { id } })
     if (!listing) return res.status(404).json({ error: 'Not found' })
     if (!admin && listing.sellerId !== userId) return res.status(403).json({ error: 'Forbidden' })
-    const updated = await prisma.listing.update({ where: { id }, data: { sold: true } })
+    const nextSold = !listing.sold
+    const updated = await prisma.listing.update({
+      where: { id },
+      data: { sold: nextSold, soldAt: nextSold ? new Date() : null },
+    })
     return res.status(200).json(updated)
   }
 

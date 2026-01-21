@@ -46,6 +46,7 @@ export default function ListingDetail() {
         <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #eee' }}>
           <div><strong>Contact name:</strong> {data.contactName}</div>
           <div><strong>Phone:</strong> {data.contactPhone}</div>
+          {data.pickupArea && <div><strong>Pickup area:</strong> {data.pickupArea}</div>}
         </div>
       </div>
       {activeImage && (

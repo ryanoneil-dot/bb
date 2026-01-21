@@ -69,6 +69,7 @@ export async function handleWebhookPayload(payload: any) {
             images: { create: images.map((url) => ({ url })) },
             contactName: pending.contactName,
             contactPhone: pending.contactPhone,
+            pickupArea: pending.pickupArea,
           },
         })
         await prisma.pendingListing.update({ where: { id: pending.id }, data: { status: 'completed' } })

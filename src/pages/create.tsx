@@ -4,7 +4,25 @@ import CheckoutPreview from '../components/CheckoutPreview'
 
 const DEFAULT_LAT = 53.6458
 const DEFAULT_LNG = -3.0050
-const categories = ['All', 'Timber', 'Masonry', 'Plumbing', 'Electrical', 'Tools', 'Paint', 'Landscaping']
+const categories = [
+  'All',
+  'Timber',
+  'Masonry',
+  'Plumbing',
+  'Electrical',
+  'Tools',
+  'Paint',
+  'Landscaping',
+  'Insulation',
+  'Roofing',
+  'Windows & Doors',
+  'Flooring',
+  'Garden & Outdoor',
+  'Bathrooms',
+  'Kitchens',
+  'Fixings & Hardware',
+  'Other',
+]
 
 export default function CreateListing() {
   const { data: session, status } = useSession()
@@ -17,6 +35,7 @@ export default function CreateListing() {
   const [files, setFiles] = useState<FileList | null>(null)
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
+  const [pickupArea, setPickupArea] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
@@ -67,6 +86,7 @@ export default function CreateListing() {
         images,
         contactName,
         contactPhone,
+        pickupArea,
       }
 
       const res = await fetch('/api/payments/create-checkout', {
@@ -124,6 +144,13 @@ export default function CreateListing() {
 
           <label style={{ display: 'block', marginTop: 8 }}>Contact phone</label>
           <input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required />
+
+          <label style={{ display: 'block', marginTop: 8 }}>Pickup area (approx)</label>
+          <input
+            value={pickupArea}
+            onChange={(e) => setPickupArea(e.target.value)}
+            placeholder="e.g. Southport, PR8"
+          />
 
           <label style={{ display: 'block', marginTop: 8 }}>Latitude</label>
           <input value={lat} onChange={(e) => setLat(e.target.value)} style={{ width: 160 }} />

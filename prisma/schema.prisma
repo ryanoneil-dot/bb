@@ -32,10 +32,12 @@ model Listing {
   sellerId    String
   contactName String
   contactPhone String
+  pickupArea  String?
   seller      User     @relation(fields: [sellerId], references: [id])
   lat         Float
   lng         Float
   sold        Boolean  @default(false)
+  soldAt      DateTime?
   createdAt   DateTime @default(now())
 }
 
@@ -65,6 +67,7 @@ model PendingListing {
   lat         Float
   lng         Float
   imagesJson  String   @default("[]")
+  pickupArea  String?
   status      String   @default("pending")
   createdAt   DateTime @default(now())
 }

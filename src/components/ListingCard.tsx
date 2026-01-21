@@ -12,7 +12,10 @@ export default function ListingCard({ listing }: { listing: any }) {
         {isSold && <div className="sold-badge">SOLD</div>}
       </div>
       <div className="card-body">
-        <div className="card-title">{listing.title}</div>
+        <div>
+          <div className="card-title">{listing.title}</div>
+          {listing.pickupArea && <div className="card-area">{listing.pickupArea}</div>}
+        </div>
         <div className="card-price">£{price}</div>
       </div>
       {listing.category && <div className="card-cat">{listing.category}</div>}
@@ -74,6 +77,12 @@ export default function ListingCard({ listing }: { listing: any }) {
         .card-title {
           font-weight: 600;
           font-size: 15px;
+        }
+
+        .card-area {
+          margin-top: 4px;
+          font-size: 12px;
+          color: #6b7380;
         }
 
         .card-price {
