@@ -12,7 +12,7 @@ export default function AdminListings() {
   useEffect(() => {
     async function load() {
       setError(null)
-      const res = await fetch('/api/admin/listings')
+      const res = await fetch('/api/admin/listings', { credentials: 'include' })
       if (!res.ok) {
         setError('Failed to load listings.')
         setLoading(false)
@@ -28,6 +28,7 @@ export default function AdminListings() {
   async function updateListing(id: string, data: any) {
     const res = await fetch(`/api/listings/${id}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
@@ -38,13 +39,15 @@ export default function AdminListings() {
 
   async function del(id: string) {
     if (!confirm('Delete listing?')) return
-    await fetch(`/api/listings/${id}`, { method: 'DELETE' })
+    await fetch(`/api/listings/${id}`, { method: 'DELETE', credentials: 'include' })
     setListings((s) => s.filter((l) => l.id !== id))
   }
 
   async function markSold(id: string) {
-    await fetch(`/api/listings/${id}?action=mark-sold`, { method: 'POST' })
-    setListings((s) => s.map((l) => (l.id === id ? { ...l, sold: true } : l)))
+    const res = await fetch(`/api/listings/${id}?action=mark-sold`, { method: 'POST', credentials: 'include' })
+    if (!res.ok) return
+    const updated = await res.json()
+    setListings((s) => s.map((l) => (l.id === id ? { ...l, ...updated } : l)))
   }
 
   if (!session) return <div className="content">Please sign in.</div>
@@ -90,7 +93,7 @@ export default function AdminListings() {
                 <input defaultValue={l.contactPhone} onBlur={(e) => updateListing(l.id, { contactPhone: e.target.value })} />
               </div>
               <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <button onClick={() => markSold(l.id)} disabled={l.sold}>Mark sold</button>
+                <button onClick={() => markSold(l.id)}>{l.sold ? 'Undo sold' : 'Mark sold'}</button>
                 <button onClick={() => del(l.id)} style={{ background: '#2a2f37' }}>Delete</button>
               </div>
             </li>

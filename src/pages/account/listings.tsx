@@ -12,7 +12,7 @@ export default function MyListings() {
   useEffect(() => {
     async function load() {
       setError(null)
-      const res = await fetch('/api/listings?mine=true')
+      const res = await fetch('/api/listings?mine=true', { credentials: 'include' })
       if (!res.ok) {
         setError('Failed to load listings.')
         setLoading(false)
@@ -27,12 +27,12 @@ export default function MyListings() {
 
   async function del(id: string) {
     if (!confirm('Delete listing?')) return
-    await fetch(`/api/listings/${id}`, { method: 'DELETE' })
+    await fetch(`/api/listings/${id}`, { method: 'DELETE', credentials: 'include' })
     setListings((s) => s.filter((l) => l.id !== id))
   }
 
   async function markSold(id: string) {
-    const res = await fetch(`/api/listings/${id}?action=mark-sold`, { method: 'POST' })
+    const res = await fetch(`/api/listings/${id}?action=mark-sold`, { method: 'POST', credentials: 'include' })
     if (!res.ok) return
     const updated = await res.json()
     setListings((s) => s.map((l) => (l.id === id ? { ...l, ...updated } : l)))
@@ -41,6 +41,7 @@ export default function MyListings() {
   async function updateListing(id: string, data: any) {
     const res = await fetch(`/api/listings/${id}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
