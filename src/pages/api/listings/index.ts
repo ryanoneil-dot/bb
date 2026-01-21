@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../lib/prisma'
-import { getSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '../auth/[...nextauth]'
 
 const SOUTHPORT_LAT = parseFloat(process.env.SOUTHPORT_LAT || '53.6458')
 const SOUTHPORT_LNG = parseFloat(process.env.SOUTHPORT_LNG || '-3.0050')
@@ -20,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     const mine = req.query.mine === 'true' || req.query.mine === '1'
     if (mine) {
-      const session = await getSession({ req })
+      const session = await getServerSession(req, res, authOptions)
       if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
       const listings = await prisma.listing.findMany({
         where: { sellerId: session.user.id },
@@ -43,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
-    const session = await getSession({ req })
+    const session = await getServerSession(req, res, authOptions)
     if (!session?.user?.id) return res.status(401).json({ error: 'Unauthorized' })
 
     const { title, description, category, pricePence, lat, lng, images = [], contactName, contactPhone } = req.body

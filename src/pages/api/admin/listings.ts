@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { prisma } from '../../../lib/prisma'
-import { getSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '../auth/[...nextauth]'
 
 function isAdmin(email?: string | null) {
   if (!email) return false
@@ -10,7 +11,7 @@ function isAdmin(email?: string | null) {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = await getSession({ req })
+  const session = await getServerSession(req, res, authOptions)
   if (!session || !isAdmin(session.user?.email)) return res.status(403).json({ error: 'Forbidden' })
 
   if (req.method === 'GET') {
