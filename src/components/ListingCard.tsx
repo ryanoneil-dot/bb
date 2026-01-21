@@ -4,9 +4,13 @@ import Link from 'next/link'
 export default function ListingCard({ listing }: { listing: any }) {
   const price = (listing.pricePence / 100).toFixed(2)
   const img = listing.images?.[0]?.url || '/placeholder.png'
+  const isSold = Boolean(listing.sold)
   return (
     <Link href={`/listings/${listing.id}`} className="card">
-      <div className="thumb" style={{ backgroundImage: `url(${img})` }} />
+      <div className="thumb">
+        <img className="thumb-img" src={img} alt={listing.title} />
+        {isSold && <div className="sold-badge">SOLD</div>}
+      </div>
       <div className="card-body">
         <div className="card-title">{listing.title}</div>
         <div className="card-price">£{price}</div>
@@ -34,9 +38,29 @@ export default function ListingCard({ listing }: { listing: any }) {
         .thumb {
           width: 100%;
           height: 150px;
-          background-size: cover;
-          background-position: center;
           background-color: #dfe3e8;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .thumb-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .sold-badge {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 0, 0, 0.55);
+          color: #fff;
+          font-weight: 700;
+          letter-spacing: 2px;
+          font-size: 18px;
         }
 
         .card-body {
