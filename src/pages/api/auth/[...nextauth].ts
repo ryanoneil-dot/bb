@@ -17,7 +17,7 @@ function verifySecret(value: string, stored: string) {
   return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(hashed, 'hex'))
 }
 
-export const authOptions = {
+export const authOptions: any = {
   adapter: PrismaAdapter(prisma as any),
   providers: [
     CredentialsProvider({
