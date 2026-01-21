@@ -30,8 +30,6 @@ export default function CreateListing() {
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('All')
   const [price, setPrice] = useState('')
-  const [lat, setLat] = useState(String(DEFAULT_LAT))
-  const [lng, setLng] = useState(String(DEFAULT_LNG))
   const [files, setFiles] = useState<FileList | null>(null)
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
@@ -81,8 +79,8 @@ export default function CreateListing() {
         description,
         category,
         pricePence: Math.round((parseFloat(price) || 0) * 100),
-        lat: parseFloat(lat),
-        lng: parseFloat(lng),
+        lat: DEFAULT_LAT,
+        lng: DEFAULT_LNG,
         images,
         contactName,
         contactPhone,
@@ -151,12 +149,6 @@ export default function CreateListing() {
             onChange={(e) => setPickupArea(e.target.value)}
             placeholder="e.g. Southport, PR8"
           />
-
-          <label style={{ display: 'block', marginTop: 8 }}>Latitude</label>
-          <input value={lat} onChange={(e) => setLat(e.target.value)} style={{ width: 160 }} />
-
-          <label style={{ display: 'block', marginTop: 8 }}>Longitude</label>
-          <input value={lng} onChange={(e) => setLng(e.target.value)} style={{ width: 160 }} />
 
           <label style={{ display: 'block', marginTop: 8 }}>Images</label>
           <input type="file" accept="image/*" multiple onChange={(e) => setFiles(e.target.files)} />
